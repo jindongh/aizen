@@ -36,7 +36,7 @@ def normalize(ds):
 	appId=0
 	print '\tNormalize appNames'
 	for appName in appNameSet:
-		dicts.appnames[appName] = appId
+		dicts.appnames[appName] = 'appid_%d' % appId
 		ds.loc[:,'appid_%d' % appId] = map(lambda x: appName in x.split(',') and 1 or 0, ds['appNames'])
 		dicts.appids.append('appid_%d' % appId)
 		appId += 1
