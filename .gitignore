@@ -1,0 +1,5 @@
+*.pyc
+users.sql
+users.csv
+output.csv
+final.users.csv

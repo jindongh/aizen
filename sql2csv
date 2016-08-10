@@ -1,0 +1,43 @@
+#!/bin/bash
+set -x
+DBUSER=root
+DBPASS=123456
+DBPREFIX=aizen
+DBNAME=${DBPREFIX}_temp
+SQL_FILE=users.sql
+CSV_FILE=users.csv
+CSV_FILE=$(touch ${CSV_FILE}; realpath ${CSV_FILE})
+SAMPLE_SIZE=100
+
+# apply sql to mysql
+function sql_to_mysql {
+	mysql -u ${DBUSER} -p${DBPASS} <<EOQ
+create database if not exists ${DBNAME}
+EOQ
+	mysql -u ${DBUSER} -p${DBPASS} -D ${DBNAME} < ${SQL_FILE}
+}
+
+# mysql to csv
+function mysql_to_csv {
+	rm -fr ${CSV_FILE}.body
+	if [ $SAMPLE_SIZE -ne 0 ];then
+		SAMPLE_SQL="limit $SAMPLE_SIZE"
+	else
+		SAMPLE_SQL=""
+	fi
+	mysql -u ${DBUSER} -p${DBPASS} -D ${DBNAME} << EOQ
+SELECT *
+FROM users ${SAMPLE_SQL}
+INTO OUTFILE "${CSV_FILE}.body"
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n';
+EOQ
+	mysql -u ${DBUSER} -p${DBPASS} -D ${DBNAME} << EOQ | awk '{if(FNR!=1) print "\""$1"\""}' | paste -d, -s >  ${CSV_FILE}.head
+describe users;
+EOQ
+	cat ${CSV_FILE}.head ${CSV_FILE}.body > ${CSV_FILE}
+	rm -fr ${CSV_FILE}.{head,body}
+}
+#sql_to_mysql
+mysql_to_csv
