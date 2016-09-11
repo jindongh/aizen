@@ -4,3 +4,7 @@ users.csv
 output.csv
 final.users.csv
 wordseg/stanford-segmenter-2015-12-09
+hjz.sh
+data-html
+data-text
+data-seged

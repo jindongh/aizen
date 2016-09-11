@@ -23,3 +23,7 @@ cat > test.in << EOF
 世界就是一个疯子的囚笼
 EOF
 ./segment.sh pku test.in UTF-8 0
+
+
+去除html标签的BeautifulSoup
+sudo apt-get install python-bs4
